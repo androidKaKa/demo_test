@@ -1,12 +1,13 @@
 <%--
   Created by IntelliJ IDEA.
-  User: maxinghai
+  User:
   Date: 2020/6/17
   Time: 9:36
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.net.*" %>
+<%@ page import="java.io.*,java.util.*" %>
 <html>
 <% int num = 5; %>
 <head>
@@ -158,5 +159,102 @@
     <br />
     <input type="submit" value="提交" />
 </form>
+<hr>
+<h2>test check file </h2>
+<input type="file" name="uploadFile" />
+<br/><br/>
+<input type="submit" value="上传" />
+
+<%
+    // 获取session创建时间
+    Date createTime = new Date(session.getCreationTime());
+    // 获取最后访问页面的时间
+    Date lastAccessTime = new Date(session.getLastAccessedTime());
+
+    String title = "test again";
+    Integer visitCount = new Integer(0);
+    String visitCountKey = new String("visitCount");
+    String userIDKey = new String("userID");
+    String userID = new String("ABCD");
+
+    // 检测网页是否有新的访问用户
+    if (session.isNew()){
+        title = "session test";
+        session.setAttribute(userIDKey, userID);
+        session.setAttribute(visitCountKey,  visitCount);
+    } else {
+        visitCount = (Integer)session.getAttribute(visitCountKey);
+        visitCount += 1;
+        userID = (String)session.getAttribute(userIDKey);
+        session.setAttribute(visitCountKey,  visitCount);
+    }
+%>
+<hr>
+<h1>Session test</h1>
+
+<table border="1" align="center">
+    <tr bgcolor="#949494">
+        <th>Session 信息</th>
+        <th>值</th>
+    </tr>
+    <tr>
+        <td>id</td>
+        <td><% out.print( session.getId()); %></td>
+    </tr>
+    <tr>
+        <td>创建时间</td>
+        <td><% out.print(createTime); %></td>
+    </tr>
+    <tr>
+        <td>最后访问时间</td>
+        <td><% out.print(lastAccessTime); %></td>
+    </tr>
+    <tr>
+        <td>用户 ID</td>
+        <td><% out.print(userID); %></td>
+    </tr>
+    <tr>
+        <td>访问次数</td>
+        <td><% out.print(visitCount); %></td>
+    </tr>
+</table>
+
+<hr>
+<p> test counter</p>
+<%
+    Integer hitsCount =
+            (Integer)application.getAttribute("hitCounter");
+    if( hitsCount ==null || hitsCount == 0 ){
+        /* 第一次访问 */
+        out.println("welcome to here!");
+        hitsCount = 1;
+    }else{
+        /* 返回访问值 */
+        out.println("welcome to here again!");
+        hitsCount += 1;
+    }
+    application.setAttribute("hitCounter", hitsCount);
+%>
+
+<p>页面访问量为: <%= hitsCount%></p>
+
+<hr>
+<h2> test auto fresh page</h2>
+<%
+    // 设置每隔5秒刷新一次
+    response.setIntHeader("Refresh", 5);
+    // 获取当前时间
+    Calendar calendar = new GregorianCalendar();
+    String am_pm;
+    int hour = calendar.get(Calendar.HOUR);
+    int minute = calendar.get(Calendar.MINUTE);
+    int second = calendar.get(Calendar.SECOND);
+    if(calendar.get(Calendar.AM_PM) == 0)
+        am_pm = "AM";
+    else
+        am_pm = "PM";
+    String CT = hour+":"+ minute +":"+ second +" "+ am_pm;
+    out.println("当前时间为: " + CT + "\n");
+%>
 </body>
 </html>
